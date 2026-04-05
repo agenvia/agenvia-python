@@ -41,7 +41,7 @@ Response
 ```python
 from agenvia import Agenvia, Action
 
-client = Agenvia(api_key="av_...", tenant_id="acme-corp")
+client = Agenvia(api_key="av_...", tenant_id="your_tenant_id")
 
 decision = client.evaluate("What are Q3 sales?", user_id="analyst-001")
 
@@ -71,14 +71,14 @@ from agenvia import Agenvia
 
 client = Agenvia(
     api_key="av_...",       # must start with av_ — get yours at https://app.agenvia.io/settings/api-keys
-    tenant_id="acme-corp",  # your organisation identifier
+    tenant_id="your_tenant_id",  # your organisation identifier
 )
 ```
 
 Invalid key format raises `ValueError` immediately — before any network call:
 
 ```python
-Agenvia(api_key="wrong_key", tenant_id="acme")
+Agenvia(api_key="wrong_key", tenant_id="your_tenant_id")
 # ValueError: Invalid API key format 'wrong_ke...'. Agenvia keys start with 'av_'.
 # Get yours at https://app.agenvia.io/settings/api-keys
 ```
@@ -97,7 +97,7 @@ if key == "off":
     # Return a stub result — no network call
     ...
 else:
-    client = Agenvia(api_key=key, tenant_id="acme-corp")
+    client = Agenvia(api_key=key, tenant_id="your_tenant_id")
 ```
 
 In CI: `AGENVIA_KEY=off`  
@@ -381,7 +381,7 @@ finding.end              # int   — end character offset in prompt
 ## Context manager
 
 ```python
-with Agenvia(api_key="av_...", tenant_id="acme") as client:
+with Agenvia(api_key="av_...", tenant_id="your_tenant_id") as client:
     decision = client.evaluate(prompt, user_id="u1")
 # HTTP connection closed automatically
 ```

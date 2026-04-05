@@ -7,7 +7,7 @@ Agenvia Python SDK
 
 Basic usage::
 
-    client = Agenvia(api_key="av_...", tenant_id="acme-corp")
+    client = Agenvia(api_key="av_...", tenant_id="your_tenant_id")
 
     decision = client.evaluate(prompt, user_id="u1")
 

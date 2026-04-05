@@ -40,7 +40,7 @@ from agenvia import (
 if not OFFLINE:
     client = Agenvia(
         api_key=AGENVIA_KEY,
-        tenant_id="acme-corp",
+        tenant_id="your_tenant_id",
     )
 
 # ---------------------------------------------------------------------------

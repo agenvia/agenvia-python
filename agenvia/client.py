@@ -76,7 +76,7 @@ class Agenvia:
 
         from agenvia import Agenvia
 
-        client = Agenvia(api_key="av_...", tenant_id="acme-corp")
+        client = Agenvia(api_key="av_...", tenant_id="your_tenant_id")
 
     Offline / CI mode — set AGENVIA_KEY=off in your environment::
 
@@ -87,7 +87,7 @@ class Agenvia:
             # Return a stub decision — no network call
             ...
         else:
-            client = Agenvia(api_key=os.environ["AGENVIA_KEY"], tenant_id="acme-corp")
+            client = Agenvia(api_key=os.environ["AGENVIA_KEY"], tenant_id="your_tenant_id")
     """
 
     def __init__(
@@ -221,7 +221,7 @@ class Agenvia:
 
             from agenvia import Agenvia, Action
 
-            client = Agenvia(api_key="av_...", tenant_id="acme")
+            client = Agenvia(api_key="av_...", tenant_id="your_tenant_id")
             decision = client.evaluate(
                 "What are Q3 sales figures?",
                 user_id="user-123",
