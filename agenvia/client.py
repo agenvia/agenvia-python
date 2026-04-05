@@ -32,7 +32,7 @@ from .models import (
 
 _UNSET = object()
 
-_BASE_URL = "https://promptrak-api-production.up.railway.app"
+_BASE_URL = "https://api.agenvia.io"
 
 
 def _parse_findings(raw: list[dict]) -> list[Finding]:
@@ -98,12 +98,19 @@ class Agenvia:
         base_url: str = _BASE_URL,
         timeout: float = 30.0,
     ) -> None:
-        if not api_key or not api_key.startswith("av_"):
+        if not api_key:
+            raise ValueError(
+                "api_key cannot be empty. "
+                "Get yours at https://app.agenvia.io/settings/api-keys"
+            )
+        if not api_key.startswith("av_"):
             raise ValueError(
                 f"Invalid API key format '{api_key[:8]}...'. "
                 "Agenvia keys start with 'av_'. "
                 "Get yours at https://app.agenvia.io/settings/api-keys"
             )
+        if not tenant_id:
+            raise ValueError("tenant_id cannot be empty.")
         self._api_key = api_key
         self._tenant_id = tenant_id
         self._base_url = base_url.rstrip("/")
@@ -383,13 +390,13 @@ class Agenvia:
     def scrub_output(
         self,
         output: str,
-        # Accept positionally for backwards compat — deprecated, remove in v0.2
-        session_id: Any = _UNSET,
+        # Deprecated positional slot — removed in v0.2
+        _pos_session_id: Any = _UNSET,
         *,
+        session_id: Any = _UNSET,
         user_id: str,
         tenant_id: str | None = None,
         task_type: str | TaskType = TaskType.GENERAL,
-        session_id_kw: str = _UNSET,  # type: ignore[assignment]
     ) -> ScrubbedOutput:
         """
         Scrub an LLM response before returning it to the caller.
@@ -426,7 +433,9 @@ class Agenvia:
             scrubbed_answer is safe to return to the caller.
         """
         # Handle deprecated positional session_id
-        if session_id is not _UNSET:
+        if _pos_session_id is not _UNSET and session_id is not _UNSET:
+            raise TypeError("session_id passed both positionally and as keyword argument")
+        if _pos_session_id is not _UNSET:
             warnings.warn(
                 "Passing session_id positionally to scrub_output() is deprecated "
                 "and will be removed in v0.2. "
@@ -434,9 +443,9 @@ class Agenvia:
                 DeprecationWarning,
                 stacklevel=2,
             )
+            resolved_session_id = _pos_session_id
+        elif session_id is not _UNSET:
             resolved_session_id = session_id
-        elif session_id_kw is not _UNSET:
-            resolved_session_id = session_id_kw
         else:
             raise TypeError("scrub_output() missing required keyword argument: 'session_id'")
 
