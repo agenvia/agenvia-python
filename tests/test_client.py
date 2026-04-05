@@ -324,7 +324,7 @@ def test_authorize_tool_allow(client: Agenvia, httpx_mock: HTTPXMock):
     auth = client.authorize_tool("read_file", "report.pdf")
 
     assert isinstance(auth, ToolDecision)
-    assert auth.decision == "allow"
+    assert auth.action == "allow"
     assert auth.approval_id is None
 
 
@@ -340,7 +340,7 @@ def test_authorize_tool_deny(client: Agenvia, httpx_mock: HTTPXMock):
         sensitivity_tier=3,
     )
 
-    assert auth.decision == "deny"
+    assert auth.action == "deny"
     assert "sensitivity_tier" in auth.reason
 
 
@@ -360,7 +360,7 @@ def test_authorize_tool_pending_approval(client: Agenvia, httpx_mock: HTTPXMock)
         sensitivity_tier=3,
     )
 
-    assert auth.decision == "pending_approval"
+    assert auth.action == "pending_approval"
     assert auth.approval_id == "appr-999"
 
 
@@ -394,6 +394,12 @@ def test_submit_approval_posts_to_correct_path(client: Agenvia, httpx_mock: HTTP
     )
     result = client.submit_approval("appr-999", "approved")
     assert result.decision == "approved"
+
+
+def test_submit_approval_rejects_invalid_decision():
+    client = Agenvia(api_key="av_test_key", tenant_id="org_test", base_url=BASE)
+    with pytest.raises(ValueError, match="'approved' or 'rejected'"):
+        client.submit_approval("appr-1", "maybe")
 
 
 # ── Error handling ────────────────────────────────────────────────────────────

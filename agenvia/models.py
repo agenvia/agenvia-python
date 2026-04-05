@@ -165,7 +165,7 @@ class ToolDecision:
     Always check ``decision`` before executing the tool.
     """
 
-    decision: str
+    action: str
     """
     One of:
       'allow'            — proceed with tool execution

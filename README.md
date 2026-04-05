@@ -43,7 +43,7 @@ from agenvia import Agenvia, Action
 
 client = Agenvia(api_key="av_...", tenant_id="your_tenant_id")
 
-decision = client.evaluate("What are Q3 sales?", user_id="your_user_id")
+decision = client.evaluate("your prompt here", user_id="your_user_id")
 
 if decision.action == Action.BLOCK:
     return decision.policy_reasons[0]
@@ -78,8 +78,8 @@ client = Agenvia(
 Invalid key format raises `ValueError` immediately — before any network call:
 
 ```python
-Agenvia(api_key="wrong_key", tenant_id="your_tenant_id")
-# ValueError: Invalid API key format 'wrong_ke...'. Agenvia keys start with 'av_'.
+Agenvia(api_key="invalid_key", tenant_id="your_tenant_id")
+# ValueError: Invalid API key format 'invalid_...'. Agenvia keys start with 'av_'.
 # Get yours at https://app.agenvia.io/settings/api-keys
 ```
 
@@ -94,8 +94,8 @@ from agenvia import Agenvia
 key = os.environ["AGENVIA_KEY"]
 
 if key == "off":
-    # Return a stub result — no network call
-    ...
+    # Skip all network calls — see examples/quickstart.py for a full offline stub
+    pass
 else:
     client = Agenvia(api_key=key, tenant_id="your_tenant_id")
 ```
@@ -175,9 +175,9 @@ decision.action           # str  — one of the 5 actions above
 decision.risk_score       # float 0.0–1.0 — higher = more sensitive
 decision.safe_prompt      # str  — use this instead of original on minimize/sanitize
 decision.findings         # list[Finding] — individual detections
-decision.policy_reasons   # list[str] — human-readable reasons, surface on block
+decision.policy_reasons   # list[str] — user-facing reasons, surface to user on block
+decision.policy_trace     # list[dict] — internal debug trace, log but do not show to users
 decision.local_only_trigger  # str | None — why local-only was triggered
-decision.policy_trace     # list[dict] — full trace for debugging
 ```
 
 ---
@@ -190,7 +190,7 @@ Use when prompts contain or may contain personal data (names, SSNs, dates of bir
 
 ```python
 safe = client.sanitize(
-    "Patient Jane Doe, DOB 1990-01-15, SSN 123-45-6789",
+    "your prompt containing personal data",
     user_id="your_user_id",
     task_type=TaskType.MEDICAL,
 )
@@ -256,27 +256,27 @@ This parameter directly affects the authorization decision. **Always pass the co
 
 | Tier | Constant | Int | Examples |
 |------|----------|-----|---------|
-| Read-only | `SensitivityTier.READ_ONLY` | 1 | LegalSearch, Calculator, KnowledgeBase |
-| Personal data | `SensitivityTier.PERSONAL` | 2 | UserLookup, CRMLookup, PatientRecord |
-| Write / action | `SensitivityTier.WRITE_ACTION` | 3 | CaseFiler, EmailSender, DatabaseWrite |
+| Read-only | `SensitivityTier.READ_ONLY` | 1 | Search, Calculator, KnowledgeBase |
+| Personal data | `SensitivityTier.PERSONAL` | 2 | UserLookup, RecordFetch, ProfileReader |
+| Write / action | `SensitivityTier.WRITE_ACTION` | 3 | DocumentFiler, MessageSender, DatabaseWrite |
 
 ```python
 from agenvia import SensitivityTier
 
 auth = client.authorize_tool(
-    "CaseFiler",
+    "your_tool_name",
     target="your_target",
     task_type=TaskType.LEGAL,
     sensitivity_tier=SensitivityTier.WRITE_ACTION,
 )
 
-if auth.decision == "allow":
-    case_filer.submit(...)
+if auth.action == "allow":
+    your_tool.execute(...)
 
-elif auth.decision == "deny":
+elif auth.action == "deny":
     return f"Tool denied: {auth.reason}"   # auth.reason is always present
 
-elif auth.decision == "pending_approval":
+elif auth.action == "pending_approval":
     # IMPORTANT: persist to database — not a local variable
     db.save_approval(approval_id=auth.approval_id)
     notify_manager(auth.approval_id, auth.reason)
@@ -286,7 +286,7 @@ elif auth.decision == "pending_approval":
 ### ToolDecision fields
 
 ```python
-auth.decision      # str — 'allow' | 'deny' | 'pending_approval'
+auth.action        # str — 'allow' | 'deny' | 'pending_approval'
 auth.reason        # str — always present, surface to user on deny/pending
 auth.approval_id   # str | None — present only on pending_approval
 auth.tool_name     # str
@@ -299,12 +299,12 @@ auth.tool_name     # str
 ```python
 # --- Step 1: Agent requests tool authorization ---
 auth = client.authorize_tool(
-    "EmailSender",
+    "your_tool_name",
     target="your_target",
     sensitivity_tier=SensitivityTier.WRITE_ACTION,
 )
 
-if auth.decision == "pending_approval":
+if auth.action == "pending_approval":
     db.save(approval_id=auth.approval_id, tool=auth.tool_name)
     notify_manager(approval_id=auth.approval_id, reason=auth.reason)
     return "Awaiting manager approval. You will be notified."
@@ -319,7 +319,7 @@ result = client.submit_approval(
 
 # --- Step 3: Resume agent after approval ---
 if result.decision == "approved":
-    auth = client.authorize_tool("EmailSender", target=..., sensitivity_tier=...)
+    auth = client.authorize_tool("your_tool_name", target=..., sensitivity_tier=...)
     # now returns allow — proceed with execution
 
 # --- Step 4: Poll for status (alternative to webhook) ---

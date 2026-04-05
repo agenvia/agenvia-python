@@ -556,7 +556,7 @@ class Agenvia:
         }
         raw = self._post("/gateway/tools/authorize", body)
         return ToolDecision(
-            decision=raw.get("decision", "deny"),
+            action=raw.get("decision", "deny"),
             reason=raw.get("reason", ""),
             approval_id=raw.get("approval_id"),
             tool_name=tool_name,
@@ -656,6 +656,11 @@ class Agenvia:
                 # Resume agent — re-call authorize_tool() which will now allow
                 auth = client.authorize_tool("CaseFiler", target=case_ref, ...)
         """
+        valid = {"approved", "rejected"}
+        if str(decision) not in valid:
+            raise ValueError(
+                f"Invalid decision {decision!r}. Must be 'approved' or 'rejected'."
+            )
         body = {"decision": str(decision)}
         raw = self._post(f"/gateway/approvals/{approval_id}/decision", body)
         return ApprovalStatus(
