@@ -518,10 +518,10 @@ class Agenvia:
         Returns
         -------
         ToolDecision
-            Check decision.decision before executing the tool:
+            Check auth.action before executing the tool:
               'allow'            — proceed
-              'deny'             — surface decision.reason to the user
-              'pending_approval' — store decision.approval_id and wait
+              'deny'             — surface auth.reason to the user
+              'pending_approval' — store auth.approval_id and wait
 
         Examples
         --------
@@ -536,11 +536,11 @@ class Agenvia:
                 sensitivity_tier=SensitivityTier.WRITE_ACTION,  # tier 3
             )
 
-            if auth.decision == "allow":
+            if auth.action == "allow":
                 case_filer.submit(...)
-            elif auth.decision == "deny":
+            elif auth.action == "deny":
                 return f"Tool denied: {auth.reason}"
-            elif auth.decision == "pending_approval":
+            elif auth.action == "pending_approval":
                 # IMPORTANT: persist approval_id to database
                 db.save_approval(auth.approval_id)
                 return f"Awaiting manager approval. ID: {auth.approval_id}"
@@ -641,7 +641,7 @@ class Agenvia:
                 "CaseFiler", target=case_ref,
                 sensitivity_tier=SensitivityTier.WRITE_ACTION,
             )
-            if auth.decision == "pending_approval":
+            if auth.action == "pending_approval":
                 db.save(approval_id=auth.approval_id, tool=auth.tool_name)
                 notify_manager(auth.approval_id, auth.reason)
                 return "Awaiting approval"
