@@ -43,7 +43,7 @@ from agenvia import Agenvia, Action
 
 client = Agenvia(api_key="av_...", tenant_id="your_tenant_id")
 
-decision = client.evaluate("What are Q3 sales?", user_id="analyst-001")
+decision = client.evaluate("What are Q3 sales?", user_id="your_user_id")
 
 if decision.action == Action.BLOCK:
     return decision.policy_reasons[0]
@@ -114,7 +114,7 @@ from agenvia import Action, TaskType
 
 decision = client.evaluate(
     prompt,
-    user_id="user-123",
+    user_id="your_user_id",
     task_type=TaskType.FINANCIAL,   # improves policy accuracy
 )
 ```
@@ -164,7 +164,7 @@ Passing the correct `task_type` applies domain-specific policies and improves ac
 ```python
 from agenvia import TaskType
 
-decision = client.evaluate(prompt, user_id="u1", task_type=TaskType.HR)
+decision = client.evaluate(prompt, user_id="your_user_id", task_type=TaskType.HR)
 ```
 
 ### Decision fields
@@ -191,7 +191,7 @@ Use when prompts contain or may contain personal data (names, SSNs, dates of bir
 ```python
 safe = client.sanitize(
     "Patient Jane Doe, DOB 1990-01-15, SSN 123-45-6789",
-    user_id="nurse-001",
+    user_id="your_user_id",
     task_type=TaskType.MEDICAL,
 )
 
@@ -219,7 +219,7 @@ safe.allowed_fields  # list[str] — field labels permitted in the response
 clean = client.scrub_output(
     llm_response,
     session_id=safe.session_id,   # keyword-only — do not pass positionally
-    user_id="nurse-001",
+    user_id="your_user_id",
 )
 
 return clean.scrubbed_answer   # safe to return to caller
@@ -229,10 +229,10 @@ return clean.scrubbed_answer   # safe to return to caller
 >
 > ```python
 > # WRONG — deprecated, breaks in v0.2
-> client.scrub_output(response, safe.session_id, user_id="u1")
+> client.scrub_output(response, safe.session_id, user_id="your_user_id")
 >
 > # CORRECT
-> client.scrub_output(response, session_id=safe.session_id, user_id="u1")
+> client.scrub_output(response, session_id=safe.session_id, user_id="your_user_id")
 > ```
 
 ### ScrubbedOutput fields
@@ -265,7 +265,7 @@ from agenvia import SensitivityTier
 
 auth = client.authorize_tool(
     "CaseFiler",
-    target="Chen Holdings v. Meridian Capital — 2024-CV-8821",
+    target="your_target",
     task_type=TaskType.LEGAL,
     sensitivity_tier=SensitivityTier.WRITE_ACTION,
 )
@@ -300,7 +300,7 @@ auth.tool_name     # str
 # --- Step 1: Agent requests tool authorization ---
 auth = client.authorize_tool(
     "EmailSender",
-    target="client@example.com",
+    target="your_target",
     sensitivity_tier=SensitivityTier.WRITE_ACTION,
 )
 
@@ -336,7 +336,7 @@ status = client.get_approval(approval_id)
 from agenvia import AgenviaError, AuthError, RateLimitError
 
 try:
-    decision = client.evaluate(prompt, user_id="u1")
+    decision = client.evaluate(prompt, user_id="your_user_id")
 except AuthError:
     # Invalid or expired API key
     redirect_to_login()
@@ -382,7 +382,7 @@ finding.end              # int   — end character offset in prompt
 
 ```python
 with Agenvia(api_key="av_...", tenant_id="your_tenant_id") as client:
-    decision = client.evaluate(prompt, user_id="u1")
+    decision = client.evaluate(prompt, user_id="your_user_id")
 # HTTP connection closed automatically
 ```
 

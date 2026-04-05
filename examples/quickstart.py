@@ -58,7 +58,7 @@ else:
     try:
         decision = client.evaluate(
             prompt,
-            user_id="analyst-001",
+            user_id="your_user_id",
             task_type=TaskType.FINANCIAL,
         )
         print(f"action      : {decision.action}")
@@ -104,7 +104,7 @@ else:
     try:
         safe = client.sanitize(
             pii_prompt,
-            user_id="nurse-001",
+            user_id="your_user_id",
             task_type=TaskType.MEDICAL,
         )
         print(f"session_id  : {safe.session_id}")
@@ -122,7 +122,7 @@ else:
         clean = client.scrub_output(
             mock_llm_response,
             session_id=safe.session_id,   # keyword-only — never pass positionally
-            user_id="nurse-001",
+            user_id="your_user_id",
             task_type=TaskType.MEDICAL,
         )
         print(f"scrubbed    : {clean.scrubbed_answer[:80]}...")
@@ -146,7 +146,7 @@ else:
     try:
         auth = client.authorize_tool(
             "CaseFiler",
-            target="Chen Holdings v. Meridian Capital — 2024-CV-8821",
+            target="your_target",
             task_type=TaskType.LEGAL,
             sensitivity_tier=SensitivityTier.WRITE_ACTION,  # tier 3 — required for court filings
         )

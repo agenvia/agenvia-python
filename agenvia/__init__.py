@@ -9,7 +9,7 @@ Basic usage::
 
     client = Agenvia(api_key="av_...", tenant_id="your_tenant_id")
 
-    decision = client.evaluate(prompt, user_id="u1")
+    decision = client.evaluate(prompt, user_id="your_user_id")
 
     if decision.action == Action.BLOCK:
         return decision.policy_reasons[0]

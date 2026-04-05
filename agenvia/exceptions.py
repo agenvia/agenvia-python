@@ -6,7 +6,7 @@ Exception hierarchy for the Agenvia SDK.
 Catch AgenviaError to handle all SDK errors in one place:
 
     try:
-        decision = client.evaluate(prompt, user_id="u1", tenant_id="your_tenant_id")
+        decision = client.evaluate(prompt, user_id="your_user_id", tenant_id="your_tenant_id")
     except AuthError:
         # bad or expired API key
     except RateLimitError:

@@ -224,7 +224,7 @@ class Agenvia:
             client = Agenvia(api_key="av_...", tenant_id="your_tenant_id")
             decision = client.evaluate(
                 "What are Q3 sales figures?",
-                user_id="user-123",
+                user_id="your_user_id",
                 task_type="financial_analysis",
             )
 
@@ -338,7 +338,7 @@ class Agenvia:
 
             safe = client.sanitize(
                 "Patient Jane Doe, DOB 1990-01-15, SSN 123-45-6789",
-                user_id="nurse-001",
+                user_id="your_user_id",
                 task_type="medical_query",
             )
 
@@ -350,7 +350,7 @@ class Agenvia:
             clean = client.scrub_output(
                 llm_response,
                 session_id=safe.session_id,  # keyword-only — do not pass positionally
-                user_id="nurse-001",
+                user_id="your_user_id",
             )
             return clean.scrubbed_answer
 
@@ -407,11 +407,11 @@ class Agenvia:
 
             Correct::
 
-                client.scrub_output(response, session_id=safe.session_id, user_id="u1")
+                client.scrub_output(response, session_id=safe.session_id, user_id="your_user_id")
 
             Wrong — raises TypeError in v0.2::
 
-                client.scrub_output(response, safe.session_id, user_id="u1")
+                client.scrub_output(response, safe.session_id, user_id="your_user_id")
 
         user_id : str
             Identifier for the user making the request.
@@ -522,7 +522,7 @@ class Agenvia:
 
             auth = client.authorize_tool(
                 "CaseFiler",
-                target="Chen Holdings v. Meridian Capital — 2024-CV-8821",
+                target="your_target",
                 task_type="legal_review",
                 sensitivity_tier=SensitivityTier.WRITE_ACTION,  # tier 3
             )
